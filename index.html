@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Cinta</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+            width: 320px;
+            border: 5px solid #ff6f61;  /* Bingkai luar */
+            background-image: linear-gradient(145deg, #ffb6b6, #ff6f61); /* Gradien untuk latar belakang */
+        }
+
+        input {
+            padding: 10px;
+            margin: 10px 0;
+            width: 80%;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #ff6f61;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #ff4f41;
+            transform: translateY(-2px);  /* Efek saat hover */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 50px;  /* Memperbesar ukuran angka */
+            font-weight: bold;
+            color: #ff6f61;
+            position: relative;
+            height: 60px;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: #fff;  /* Latar belakang angka */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1;  /* Pastikan angka berada di atas air */
+            transition: color 1s ease;  /* Transisi warna angka */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .filling {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 0%;
+            transition: height 1s ease-out;
+            z-index: 0;  /* Pastikan air berada di bawah angka */
+        }
+
+        .container h2 {
+            font-size: 24px;
+            color: #fff;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .container p {
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .emotes {
+            position: absolute;
+            top: 100px;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Jangan ganggu interaksi dengan elemen lain */
+            z-index: 2;
+        }
+
+        .emote {
+            font-size: 30px;
+            position: absolute;
+            animation: flyUp 2s infinite ease-out;
+            pointer-events: none;
+        }
+
+        /* Animasi terbang ke atas */
+        @keyframes flyUp {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(-200px) rotate(360deg);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-400px) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Kalkulator Cinta</h2>
+        <p>Masukkan dua nama untuk melihat seberapa cocok kalian!</p>
+        
+        <input type="text" id="name1" placeholder="Nama 1" />
+        <input type="text" id="name2" placeholder="Nama 2" />
+        
+        <button onclick="calculateLove()">Hitung Cinta!</button>
+
+        <div class="result" id="result">
+            <div class="filling" id="filling"></div>
+            <span id="percentText">0%</span>
+        </div>
+
+        <div id="emotes" class="emotes"></div> <!-- Tempat untuk menampilkan emote -->
+    </div>
+
+    <script>
+        function calculateLove() {
+            var name1 = document.getElementById('name1').value;
+            var name2 = document.getElementById('name2').value;
+
+            if (name1 === '' || name2 === '') {
+                alert('Mohon masukkan kedua nama!');
+                return;
+            }
+
+            // Menggabungkan nama-nama menjadi string tunggal
+            var combinedNames = name1 + name2;
+            var loveScore = 0;
+
+            // Menjumlahkan ASCII value dari setiap karakter pada nama
+            for (var i = 0; i < combinedNames.length; i++) {
+                loveScore += combinedNames.charCodeAt(i);
+            }
+
+            // Menentukan persen kecocokan antara 0 hingga 100
+            loveScore = (loveScore % 100) + 1;
+
+            // Menampilkan animasi air (mengisi ruang) 
+            var resultDiv = document.getElementById('result');
+            var fillingDiv = document.getElementById('filling');
+            var percentText = document.getElementById('percentText');
+            var emotesDiv = document.getElementById('emotes');
+
+            // Reset elemen
+            fillingDiv.style.height = '0%'; // Reset dulu
+            percentText.innerHTML = '0%';
+            resultDiv.style.color = '#ff6f61'; // Reset warna angka
+            emotesDiv.innerHTML = '';  // Reset emote
+
+            // Mulai animasi pengisian air dan perhitungan angka
+            setTimeout(function() {
+                var current = 0;
+                var interval = setInterval(function() {
+                    percentText.innerHTML = current + '%';
+                    fillingDiv.style.height = current + '%';  // Mengisi air sesuai dengan angka
+
+                    // Mengubah warna air berdasarkan persentase
+                    if (current <= 50) {
+                        fillingDiv.style.backgroundColor = 'rgba(255, 0, 0, 0.7)';  // Merah jika <= 50%
+                    } else {
+                        fillingDiv.style.backgroundColor = 'rgba(0, 255, 0, 0.7)';  // Hijau jika > 50%
+                    }
+
+                    // Ganti warna angka menjadi hitam saat proses penghitungan
+                    resultDiv.style.color = 'black';  // Ganti warna angka menjadi hitam
+
+                    current = Math.min(current + Math.floor(Math.random() * 2), loveScore);  // Naik pelan, langkah kecil
+                    if (current >= loveScore) {
+                        clearInterval(interval);
+
+                        // Setelah animasi selesai, tampilkan emote sesuai dengan hasil
+                        if (current < 50) {
+                            // Menampilkan banyak emote sedih yang terbang ke atas
+                            for (var i = 0; i < 20; i++) {
+                                createEmote('😢');
+                            }
+                        } else {
+                            // Menampilkan banyak emote cinta yang terbang ke atas
+                            for (var i = 0; i < 20; i++) {
+                                createEmote('❤️');
+                            }
+                        }
+                    }
+                }, 50); // Update setiap 50ms untuk memberikan kesan pelan
+            }, 100);  // Delay sedikit untuk menunggu reset animasi
+        }
+
+        function createEmote(emote) {
+            var emotesDiv = document.getElementById('emotes');
+            var emoteDiv = document.createElement('div');
+            emoteDiv.classList.add('emote');
+            emoteDiv.innerHTML = emote;
+            emoteDiv.style.left = Math.random() * 100 + '%';  // Posisi acak dari kiri
+            emoteDiv.style.animationDelay = Math.random() * 2 + 's';  // Delay acak untuk animasi
+
+            emotesDiv.appendChild(emoteDiv);
+
+            // Menghapus emote setelah animasi selesai
+            setTimeout(function() {
+                emotesDiv.removeChild(emoteDiv);
+            }, 2000);
+        }
+    </script>
+
+</body>
+</html>
